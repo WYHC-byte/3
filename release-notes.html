@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Release Notes - TyloAI</title>
+    <style>
+        :root {
+            --bg-color: #131316;
+            --sidebar-bg: #131316;
+            --text-primary: #EDEDED;
+            --text-secondary: #9CA3AF;
+            --accent-color: #D97757;
+            --border-color: #27272A;
+            --hover-bg: #27272A;
+            --link-color: #60A5FA;
+            --code-bg: #09090b;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        html[data-theme="light"] {
+            --bg-color: #FFFFFF;
+            --sidebar-bg: #F5F5F5;
+            --text-primary: #1F1F1F;
+            --text-secondary: #666666;
+            --accent-color: #D97757;
+            --border-color: #E5E5E5;
+            --hover-bg: #F0F0F0;
+            --link-color: #0066CC;
+            --code-bg: #F5F5F5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-family);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Header --- */
+        header {
+            height: 60px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            background-color: var(--bg-color);
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        
+        .logo-img {
+            width: 24px;
+            height: 24px;
+            color: var(--accent-color);
+            flex-shrink: 0;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            align-items: center;
+            height: 100%;
+        }
+
+        .header-nav a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            padding: 6px 12px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            height: 32px;
+        }
+
+        .header-nav a:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .header-nav a.active {
+            color: var(--text-primary);
+            background: #27272A;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 14px;
+        }
+
+        .login-btn {
+            background: #E5E7EB;
+            color: #000;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* --- Main Layout --- */
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar Left --- */
+        .sidebar-left {
+            width: 280px;
+            border-right: 1px solid var(--border-color);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            background: var(--sidebar-bg);
+        }
+
+        .search-box {
+            background: #1C1C1F;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 24px;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .search-box.focus {
+            border-color: #D97757;
+            box-shadow: 0 0 12px rgba(217, 119, 87, 0.4),
+                        inset 0 0 10px rgba(217, 119, 87, 0.1),
+                        0 0 20px rgba(217, 119, 87, 0.2);
+            background: linear-gradient(135deg, #1C1C1F 0%, rgba(217, 119, 87, 0.05) 100%);
+        }
+        
+        .search-box input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            width: 100%;
+            margin-left: 8px;
+            font-size: 14px;
+        }
+        
+        .search-box input::placeholder { color: #52525B; }
+        .search-box span:last-child {
+            margin-left: auto;
+            font-size: 12px;
+            border: 1px solid #3F3F46;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #52525B;
+        }
+
+        .nav-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .nav-group { margin-bottom: 24px; }
+
+        .nav-group h3 {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+            padding-left: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-group h3::before {
+            content: '';
+            width: 4px;
+            height: 4px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 6px 8px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            border-radius: 6px;
+            margin-bottom: 2px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border-left: 2px solid transparent;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            color: var(--text-primary);
+            background: rgba(255,255,255,0.08);
+            transform: translateX(4px);
+            border-left-color: var(--accent-color);
+        }
+
+        .nav-item.active {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* --- Main Content Area --- */
+        .main-content {
+            flex: 1;
+            padding: 0;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .content-wrapper {
+            padding: 48px 64px;
+            max-width: 900px;
+            margin: 0 auto;
+            min-height: 100%;
+        }
+
+        /* --- Section Logic --- */
+        .section-block {
+            display: block; /* Always display the overview for this page */
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Typography & Elements --- */
+        .breadcrumb {
+            color: var(--link-color);
+            font-size: 14px;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-top: 50px;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-top: 32px;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.7;
+            color: #A1A1AA;
+            margin-bottom: 16px;
+        }
+
+        ul, ol {
+            margin-left: 24px;
+            margin-bottom: 24px;
+            color: #A1A1AA;
+            line-height: 1.7;
+        }
+        
+        li { margin-bottom: 8px; }
+
+        .callout {
+            padding: 16px 20px;
+            border-left: 4px solid var(--link-color);
+            background: rgba(96, 165, 250, 0.1);
+            border-radius: 0 6px 6px 0;
+            margin: 24px 0;
+            color: #BFDBFE;
+        }
+
+        code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #FCA5A5;
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+        }
+
+        .tag-pill {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        .tag-new { background: #059669; color: white; }
+        .tag-update { background: #2563EB; color: white; }
+        .tag-fix { background: #D97706; color: white; }
+        .tag-deprecated { background: #DC2626; color: white; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #3F3F46; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #52525B; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <svg class="logo-img" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <mask id="cutout-mask">
+                        <rect x="0" y="0" width="100" height="100" fill="white" />
+                        <path d="M -10,34 H 38 Q 58,34 58,54 V 58 Q 58,78 78,78 H 82" fill="none" stroke="black" stroke-width="18" stroke-linecap="round" />
+                    </mask>
+                </defs>
+                <rect width="100" height="100" fill="currentColor" mask="url(#cutout-mask)" />
+            </svg>
+            <span>TyloAI Docs</span>
+        </div>
+
+        <nav class="header-nav">
+            <a href="index.html">Home</a>
+            <a href="docs.html">Docs</a>
+            <a href="release-notes.html" class="active">Release Notes</a>
+            <a href="https://modelcontextprotocol.io">MCP ↗</a>
+            <a href="ode-code.html">ode-code CLI docs</a>
+        </nav>
+        <div class="header-right">
+            <button id="theme-toggle" 
+                style="
+                background: none;
+                border: 1px solid var(--border-color);
+                color: var(--text-secondary);
+                width: 32px;
+                height: 32px;
+                border-radius: 6px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s;
+                "
+                onmouseover="this.style.background='rgba(255,255,255,0.05)'"
+                onmouseout="this.style.background='none'"
+            >
+                <svg id="theme-icon" width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11 10.07 7.5 12 7.5s3.5 1.57 3.5 3.5z"/>
+                </svg>
+            </button>
+            <span>English</span>
+            <a href="https://tyloai.com" class="login-btn">Login</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar-left">
+            <div class="search-box">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" id="sidebar-search" placeholder="Search...">
+                <span>⌘K</span>
+            </div>
+
+            <nav class="nav-content" id="sidebar-nav">
+                <div class="nav-group">
+                    <h3>Release History</h3>
+                    <div data-target="overview" class="nav-item active">Overview</div>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-wrapper">
+                
+                <section id="overview" class="section-block">
+                    <div class="breadcrumb">Home | Release Notes</div>
+                    <h1>Overview</h1>
+                    <p>Updates to the TyloAI developer platform, including TyloAI API, clients, and ode-code CLI.</p>
+                    
+                    <h3>On this page:</h3>
+                    <ul>
+                        <li>Release notes for TyloAI clients.</li>
+                        <li>Update notes for ode-code CLI.</li>
+                        <li>For more ode-code CLI updates, please refer to the full <a href="#" style="color:var(--link-color)">CHANGELOG.md</a> in the repository.</li>
+                    </ul>
+
+                    <h2>November 2025 <span class="tag-pill tag-new">New</span></h2>
+                    <h3>TyloAI ode-7 Family Launch</h3>
+                    <p>We officially launched the TyloAI ode-7 model family, marking a new era of reasoning capabilities.</p>
+                    <ul>
+                        <li><strong>ode-7-reasoning:</strong> Our flagship model with "Post-Thinking" capabilities for complex tasks.</li>
+                        <li><strong>ode-7:</strong> The balanced core model for enterprise applications.</li>
+                        <li><strong>ode-7-flash:</strong> High-speed model supporting Extended Thinking.</li>
+                        <li>Introduced <code>-thinking</code> and <code>-post-thinking</code> API suffixes for granular control over cognitive processes.</li>
+                    </ul>
+                    <h3>ode-code CLI v2.1</h3>
+                    <ul>
+                        <li>Added support for the new ode-7 model family.</li>
+                        <li>New <code>/init</code> command to intelligently analyze workspace and generate project-specific instructions.</li>
+                    </ul>
+
+                    <h2>October 2025</h2>
+                    <h3>Extended Thinking Beta</h3>
+                    <p>Opened public beta for Extended Thinking capabilities on the web interface.</p>
+                    <ul>
+                        <li>Users can now manually toggle "Enable Extended Thinking" in the chat settings.</li>
+                        <li>Added visualization for the thinking process in the UI (expandable logic blocks).</li>
+                    </ul>
+                    <h3>Web Search Integration <span class="tag-pill tag-update">Update</span></h3>
+                    <p>Improved the RAG pipeline for web search, reducing latency by 30% and improving source citation accuracy.</p>
+
+                    <h2>September 2025</h2>
+                    <h3>ode-5 Deprecation Notice <span class="tag-pill tag-deprecated">Important</span></h3>
+                    <p>Officially announced the End of Life (EOL) for the ode-5 model family.</p>
+                    <ul>
+                        <li>All <code>ode-5</code> API endpoints now return <code>410 Gone</code>.</li>
+                        <li>Documentation updated to reflect migration paths to ode-6 and ode-7.</li>
+                    </ul>
+                    <h3>ode-code CLI v2.0</h3>
+                    <p>Major version update for our command line interface.</p>
+                    <ul>
+                        <li><strong>Multi-file Editing:</strong> ode-code can now safely edit up to 20 files simultaneously with atomic commits.</li>
+                        <li><strong>Terminal UI Overhaul:</strong> Completely redesigned the interactive terminal interface for better readability.</li>
+                    </ul>
+
+                    <h2>August 2025</h2>
+                    <h3>Artifacts General Availability</h3>
+                    <p>Artifacts moved from experimental to General Availability (GA) for all users, including the Free tier.</p>
+                    <ul>
+                        <li>Added support for React, Vue, and plain HTML5 previews.</li>
+                        <li>Introduced "One-Click Debug" console within the Artifact preview window.</li>
+                    </ul>
+
+                    <h2>July 2025</h2>
+                    <h3>Prompt Caching <span class="tag-pill tag-new">Feature</span></h3>
+                    <p>Introduced Prompt Caching to significantly reduce costs for repetitive contexts.</p>
+                    <ul>
+                        <li>Cache system prompts and large documents with <code>cache_control: {"type": "ephemeral"}</code>.</li>
+                        <li>Up to 90% cost reduction for cached input tokens.</li>
+                    </ul>
+
+                    <h2>June 2025</h2>
+                    <h3>Vision Capabilities Upgrade</h3>
+                    <p>Enhanced visual processing for the ode-6 family.</p>
+                    <ul>
+                        <li>Improved OCR accuracy for handwritten text.</li>
+                        <li>Better understanding of complex charts and scientific diagrams.</li>
+                    </ul>
+
+                    <h2>May 2025</h2>
+                    <h3>ode-6 Maintenance Mode</h3>
+                    <p>With the upcoming ode-7 release, the ode-6 family has entered maintenance mode. No new features will be added, but security patches will continue until March 2026.</p>
+
+                    <h2>April 2025</h2>
+                    <h3>Mobile App Updates</h3>
+                    <p>Released updated iOS and Android applications.</p>
+                    <ul>
+                        <li>Sync chat history across Web and Mobile in real-time.</li>
+                        <li>Added voice mode for hands-free interaction.</li>
+                    </ul>
+
+                    <h2>March 2025</h2>
+                    <h3>New Regions</h3>
+                    <p>TyloAI API is now available in new European regions with reduced latency for EU customers.</p>
+                    <ul>
+                        <li>Frankfurt (eu-central-1)</li>
+                        <li>Dublin (eu-west-1)</li>
+                    </ul>
+
+                    <h2>February 2025</h2>
+                    <h3>Python SDK v1.5</h3>
+                    <p>Released version 1.5 of the official TyloAI Python SDK.</p>
+                    <ul>
+                        <li>Added native support for asynchronous streaming.</li>
+                        <li>Improved type hinting for better IDE autocomplete support.</li>
+                    </ul>
+
+                    <h2>January 2025</h2>
+                    <h3>Project "Ode" Teaser</h3>
+                    <p>First public announcement of the "Ode" architecture, promising a shift from pure prediction to reasoning-based AI models.</p>
+
+                </section>
+                
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Theme Toggle Logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const htmlElement = document.documentElement;
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+
+        // Initialize Theme
+        htmlElement.setAttribute('data-theme', savedTheme);
+
+        themeToggle.addEventListener('click', function() {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // Search Focus Logic
+        const searchInput = document.getElementById('sidebar-search');
+        document.addEventListener('keydown', function(e) {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                searchInput.focus();
+            }
+        });
+
+        searchInput.addEventListener('focus', function() {
+            document.querySelector('.search-box').classList.add('focus');
+        });
+
+        searchInput.addEventListener('blur', function() {
+            document.querySelector('.search-box').classList.remove('focus');
+        });
+    </script>
+</body>
+</html>

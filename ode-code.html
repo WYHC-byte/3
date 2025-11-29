@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ode-code CLI - TyloAI Documentation</title>
+    <style>
+        /* --- INHERITED STYLES FROM DOCS.HTML --- */
+        :root {
+            --bg-color: #131316;
+            --sidebar-bg: #131316;
+            --text-primary: #EDEDED;
+            --text-secondary: #9CA3AF;
+            --accent-color: #D97757; /* The orange/terracotta color */
+            --border-color: #27272A;
+            --hover-bg: #27272A;
+            --link-color: #60A5FA;
+            --code-bg: #09090b;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --hero-serif: "Times New Roman", Times, serif;
+        }
+        html[data-theme="light"] {
+            --bg-color: #FFFFFF;
+            --sidebar-bg: #F5F5F5;
+            --text-primary: #1F1F1F;
+            --text-secondary: #666666;
+            --accent-color: #D97757;
+            --border-color: #E5E5E5;
+            --hover-bg: #F0F0F0;
+            --link-color: #0066CC;
+            --code-bg: #F5F5F5;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-family);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Header --- */
+        header {
+            height: 60px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            background-color: var(--bg-color);
+            flex-shrink: 0;
+            z-index: 10;
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 18px; }
+        .logo-img { width: 24px; height: 24px; color: var(--accent-color); flex-shrink: 0; }
+        .header-nav { display: flex; gap: 8px; font-size: 14px; color: var(--text-secondary); align-items: center; height: 100%; }
+        .header-nav a {
+            text-decoration: none; color: var(--text-secondary); transition: all 0.2s;
+            padding: 6px 12px; border-radius: 6px; display: flex; align-items: center; height: 32px;
+        }
+        .header-nav a:hover { color: var(--text-primary); background: rgba(255, 255, 255, 0.05); }
+        .header-nav a.active { color: var(--text-primary); background: #27272A; }
+        .header-right { display: flex; align-items: center; gap: 16px; font-size: 14px; }
+        .login-btn { background: #E5E7EB; color: #000; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 500; }
+
+        /* --- Layout --- */
+        .container { display: flex; flex: 1; overflow: hidden; }
+
+        /* --- Sidebar --- */
+        .sidebar-left {
+            width: 280px; border-right: 1px solid var(--border-color); padding: 16px;
+            display: flex; flex-direction: column; flex-shrink: 0; background: var(--sidebar-bg);
+        }
+        .search-box {
+            background: #1C1C1F; border: 2px solid var(--border-color); border-radius: 8px;
+            padding: 8px 12px; display: flex; align-items: center; color: var(--text-secondary);
+            font-size: 14px; margin-bottom: 24px; flex-shrink: 0; transition: all 0.3s ease;
+        }
+        .search-box.focus { border-color: #D97757; background: linear-gradient(135deg, #1C1C1F 0%, rgba(217, 119, 87, 0.05) 100%); }
+        .search-box input { background: transparent; border: none; outline: none; color: var(--text-primary); width: 100%; margin-left: 8px; font-size: 14px; }
+        .nav-content { flex: 1; overflow-y: auto; padding-right: 4px; }
+        .nav-group { margin-bottom: 24px; }
+        .nav-group.hidden { display: none; }
+        .nav-group h3 {
+            font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600;
+            padding-left: 8px; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px;
+        }
+        .nav-group h3::before { content: ''; width: 4px; height: 4px; background: var(--accent-color); border-radius: 50%; display: inline-block; }
+        .nav-item {
+            display: block; padding: 6px 8px; text-decoration: none; color: var(--text-secondary);
+            font-size: 14px; border-radius: 6px; margin-bottom: 2px; transition: all 0.2s; cursor: pointer; border-left: 2px solid transparent;
+        }
+        .nav-item:hover { color: var(--text-primary); background: rgba(255,255,255,0.08); transform: translateX(4px); border-left-color: var(--accent-color); }
+        .nav-item.active { background: var(--hover-bg); color: var(--text-primary); font-weight: 500; }
+        .nav-item.hidden { display: none !important; }
+
+        /* --- Main Content --- */
+        .main-content { flex: 1; padding: 0; overflow-y: auto; position: relative; }
+        .content-wrapper { padding: 48px 64px; max-width: 900px; margin: 0 auto; min-height: 100%; }
+        .section-block { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .section-block.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Typography --- */
+        h1 { font-size: 42px; font-weight: 600; margin-bottom: 24px; line-height: 1.1; }
+        h2 { font-size: 28px; font-weight: 600; margin-top: 40px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+        h3 { font-size: 20px; font-weight: 600; margin-top: 32px; margin-bottom: 12px; }
+        p { font-size: 16px; line-height: 1.7; color: #A1A1AA; margin-bottom: 16px; }
+        ul, ol { margin-left: 24px; margin-bottom: 24px; color: #A1A1AA; line-height: 1.7; }
+        li { margin-bottom: 8px; }
+        
+        .code-block-wrapper { background: var(--code-bg); border: 1px solid var(--border-color); border-radius: 8px; margin: 20px 0; overflow: hidden; }
+        .code-header { display: flex; justify-content: space-between; padding: 8px 16px; background: #18181B; border-bottom: 1px solid var(--border-color); font-size: 12px; color: var(--text-secondary); font-family: monospace; }
+        pre { padding: 16px; overflow-x: auto; margin: 0; font-family: 'Menlo', monospace; font-size: 14px; color: #E5E7EB; }
+        code { font-family: inherit; }
+        p code, li code { background: rgba(255, 255, 255, 0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; color: #FCA5A5; }
+        
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 15px; }
+        th, td { border: 1px solid var(--border-color); padding: 12px; text-align: left; color: #A1A1AA; }
+        th { background: #18181B; color: var(--text-primary); font-weight: 600; }
+
+        /* --- Special "Hero" Styling for Overview Section --- */
+        .hero-container {
+            text-align: center;
+            padding: 60px 0 40px 0;
+        }
+
+        .synthesizing-pill {
+            display: inline-block;
+            border: 1px solid #E5E5E5;
+            background: rgba(255,255,255,0.05);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+        .synthesizing-pill span { color: var(--accent-color); }
+
+        .hero-title {
+            font-size: 80px; /* Large scale */
+            font-family: var(--hero-serif);
+            font-weight: 400; /* Regular weight for serif */
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 24px;
+            letter-spacing: -0.02em;
+        }
+        
+        /* Typewriter Effect Styles */
+        .hero-title .arrow {
+            color: var(--accent-color);
+            font-family: -apple-system, sans-serif;
+            font-weight: 300;
+            margin: 0 10px;
+        }
+        
+        .typewriter-text {
+            color: var(--accent-color);
+            font-style: italic;
+            border-bottom: 2px solid transparent; /* Placeholder to keep height stable */
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            background-color: var(--accent-color);
+            animation: blink 1s infinite;
+            margin-left: 2px;
+            vertical-align: middle;
+            height: 60px; /* Adjust based on font size */
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .hero-subtext {
+            font-size: 20px;
+            max-width: 700px;
+            margin: 0 auto 40px auto;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .install-command-box {
+            background: #F0F0F0;
+            display: inline-flex;
+            align-items: center;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-family: monospace;
+            font-size: 16px;
+            color: #333;
+            gap: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        html[data-theme="dark"] .install-command-box {
+            background: #27272A;
+            color: #EDEDED;
+            border: 1px solid #3F3F46;
+        }
+        .install-command-box:hover { 
+            transform: translateY(-2px); 
+            border-color: var(--accent-color);
+        }
+        .install-command-box:active {
+            transform: translateY(0);
+        }
+        
+        /* SVG Transitions */
+        .copy-icon, .check-icon {
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        .hidden-icon {
+            display: none;
+            opacity: 0;
+            transform: scale(0.5);
+        }
+        .visible-icon {
+            display: block;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .documentation-link {
+            display: block;
+            margin-top: 24px;
+            color: var(--text-secondary);
+            text-decoration: underline;
+            font-size: 14px;
+        }
+
+        /* --- Feature Grid for Overview --- */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 60px;
+        }
+        .feature-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            border-radius: 12px;
+        }
+        .feature-card h4 { color: var(--text-primary); margin-bottom: 12px; font-size: 18px; font-weight: 600; }
+        .feature-card p { font-size: 14px; margin-bottom: 0; }
+
+        /* Floating Button */
+        .ask-docs-btn {
+            position: fixed; bottom: 24px; right: 24px; background: #3F3F46; color: white;
+            border: none; padding: 10px 16px; border-radius: 20px; font-weight: 500;
+            display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            cursor: pointer; z-index: 100; transition: transform 0.2s, background 0.2s; text-decoration: none;
+        }
+        .ask-docs-btn:hover { transform: translateY(-2px); background: #52525B; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <svg class="logo-img" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <mask id="cutout-mask">
+                        <rect x="0" y="0" width="100" height="100" fill="white" />
+                        <path d="M -10,34 H 38 Q 58,34 58,54 V 58 Q 58,78 78,78 H 82" fill="none" stroke="black" stroke-width="18" stroke-linecap="round" />
+                    </mask>
+                </defs>
+                <rect width="100" height="100" fill="currentColor" mask="url(#cutout-mask)" />
+            </svg>
+            <span>TyloAI Docs</span>
+        </div>
+
+        <nav class="header-nav">
+            <a href="index.html">Home</a>
+            <a href="docs.html">Docs</a>
+            <a href="release-notes.html">Release Notes</a>
+            <a href="https://modelcontextprotocol.io">MCP ↗</a>
+            <a href="ode-code.html" class="active">ode-code CLI docs</a>
+        </nav>
+        <div class="header-right">
+            <button id="theme-toggle" 
+                style="
+                background: none;
+                border: 1px solid var(--border-color);
+                color: var(--text-secondary);
+                width: 32px;
+                height: 32px;
+                border-radius: 6px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s;
+                "
+                onmouseover="this.style.background='rgba(255,255,255,0.05)'"
+                onmouseout="this.style.background='none'"
+            >
+                <svg id="theme-icon" width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11 10.07 7.5 12 7.5s3.5 1.57 3.5 3.5z"/>
+                </svg>
+            </button>
+            <span>English</span>
+            <a href="https://tyloai.com" class="login-btn">Login</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar-left">
+            <div class="search-box">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" id="sidebar-search" placeholder="Search...">
+                <span>⌘K</span>
+            </div>
+
+            <nav class="nav-content" id="sidebar-nav">
+                <div class="nav-group">
+                    <h3>First steps</h3>
+                    <div data-target="overview" class="nav-item active">Overview</div>
+                    <div data-target="quickstart" class="nav-item">Quick Start</div>
+                    <div data-target="pricing" class="nav-item">Pricing</div>
+                </div>
+
+                <div class="nav-group">
+                    <h3>Work Modes</h3>
+                    <div data-target="modes-overview" class="nav-item">Three Working Modes</div>
+                    <div data-target="flash-mode" class="nav-item">Flash Mode</div>
+                    <div data-target="medium-mode" class="nav-item">Medium Mode</div>
+                    <div data-target="high-mode" class="nav-item">High Mode</div>
+                </div>
+
+                <div class="nav-group">
+                    <h3>Core Capabilities</h3>
+                    <div data-target="file-editing" class="nav-item">Real Code Editing</div>
+                    <div data-target="workflow" class="nav-item">Smart Workflow</div>
+                    <div data-target="commands" class="nav-item">Commands & Tools</div>
+                </div>
+
+                <div class="nav-group">
+                    <h3>Experience & Safety</h3>
+                    <div data-target="interactive" class="nav-item">Interactive UX</div>
+                    <div data-target="safety" class="nav-item">Safety & Logs</div>
+                    <div data-target="config" class="nav-item">ode-code.md Config</div>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-wrapper">
+
+                <section id="overview" class="section-block active">
+                    <div class="hero-container">
+                        <div class="synthesizing-pill">○ Synthesizing... <span>ode-code</span></div>
+                        
+                        <h1 class="hero-title">
+                            Build <span class="arrow">></span> <span id="typewriter" class="typewriter-text"></span><span class="cursor"></span> with AI
+                        </h1>
+                        
+                        <p class="hero-subtext">
+                            Unleash TyloAI's raw power directly in your terminal or IDE. Search million-line codebases instantly. Turn hours-long workflows into a single command. Your tools. Your workflow. Your codebase, evolving at thought speed.
+                        </p>
+
+                        <div class="install-command-box" id="copyBtn">
+                            <code>npm install -g @tyloai/ode-code@latest</code>
+                            <!-- Copy Icon -->
+                            <svg class="copy-icon visible-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            <!-- Check Icon (Hidden by default) -->
+                            <svg class="check-icon hidden-icon" width="20" height="20" fill="none" stroke="#10B981" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                        
+                        <a href="#quickstart" class="documentation-link">Or read the documentation below</a>
+                    </div>
+
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h4>Powered by ode-7</h4>
+                            <p>Driven by our proprietary ode-7 model for unmatched reasoning.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>Real File Access</h4>
+                            <p>Directly create, edit, and delete files in your local environment with diff views.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>3 Velocity Modes</h4>
+                            <p>Choose between Flash speed, Balanced iteration, or High-level deep planning.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="quickstart" class="section-block">
+                    <div class="breadcrumb">First steps / Quick Start</div>
+                    <h1>Quick Start Guide</h1>
+                    <p><strong>ode-code CLI</strong> (TyloAI-CLI-Coding-Agent) is an intelligent terminal partner. It can read, create, or modify local files while executing commands you know. It requires a one-time global installation.</p>
+
+                    <h2>Installation</h2>
+                    <p>Ensure you have Node.js installed, then run:</p>
+                    <div class="code-block-wrapper">
+                        <div class="code-header">Terminal</div>
+                        <pre>npm install -g @tyloai/ode-code@latest</pre>
+                    </div>
+
+                    <h2>Login & Initialization</h2>
+                    <p>Once installed, start the agent in any project directory:</p>
+                    <div class="code-block-wrapper">
+                        <div class="code-header">Terminal</div>
+                        <pre>ode code</pre>
+                    </div>
+                    <p>On your first run, you will be prompted to log in via browser. Afterward, simply navigate to your project folder and run `ode code` to start coding.</p>
+                </section>
+                
+                 <section id="pricing" class="section-block">
+                    <div class="breadcrumb">First steps / Pricing</div>
+                    <h1>CLI Pricing</h1>
+                    <p>The CLI consumes credits from your main TyloAI web account. Usage is calculated based on input tokens (context reading) and output tokens (code generation).</p>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Mode</th>
+                                <th>Cost Factor</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Flash Mode</strong></td>
+                                <td>1x</td>
+                                <td>Standard token rates. Most economical for quick fixes.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Medium Mode</strong></td>
+                                <td>~5x</td>
+                                <td>Iterates automatically. Costs more due to multiple internal verification steps.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>High Mode</strong></td>
+                                <td>~10x - 20x</td>
+                                <td>Deep planning and extended reasoning. Highest cost for complex architectural tasks.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Deep Thinking (Tab)</strong></td>
+                                <td>2x</td>
+                                <td>Enabling deep thinking doubles the base cost of any request.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <section id="modes-overview" class="section-block">
+                    <div class="breadcrumb">Work Modes / Overview</div>
+                    <h1>Three Working Modes</h1>
+                    <p>Different tasks require different levels of cognitive load. ode-code offers three distinct modes to adapt to your needs.</p>
+                    <p>You can switch modes at any time during a session by typing <code>/mode</code>.</p>
+                </section>
+
+                <section id="flash-mode" class="section-block">
+                    <div class="breadcrumb">Work Modes / Flash Mode</div>
+                    <h1>Flash Mode</h1>
+                    <p><strong>The Quick Shooter.</strong> Flash Mode is optimized for low-latency, single-turn tasks. It is the default mode when you start the CLI.</p>
+                    
+                    <h3>When to use Flash Mode:</h3>
+                    <ul>
+                        <li>Fixing a simple syntax error or typo.</li>
+                        <li>Generating a small utility function.</li>
+                        <li>Writing comments or documentation for a single file.</li>
+                        <li>Quick queries about the codebase (e.g., "Where is the auth logic defined?").</li>
+                    </ul>
+
+                    <h3>Characteristics:</h3>
+                    <table>
+                        <tr>
+                            <td><strong>Context Window</strong></td>
+                            <td>Focused (Current file + user selection)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reasoning</strong></td>
+                            <td>Fast, direct (Model: ode-7-turbo)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Iteration</strong></td>
+                            <td>None (Single Shot)</td>
+                        </tr>
+                    </table>
+                </section>
+
+                <section id="medium-mode" class="section-block">
+                    <div class="breadcrumb">Work Modes / Medium Mode</div>
+                    <h1>Medium Mode</h1>
+                    <p><strong>The Balanced Iterator.</strong> Medium Mode introduces an Agentic Loop. It doesn't just write code; it runs it, checks for errors, and fixes itself.</p>
+
+                    <h3>How it works:</h3>
+                    <ol>
+                        <li><strong>Draft:</strong> The AI writes the initial code based on your request.</li>
+                        <li><strong>Verify:</strong> It attempts to compile or lint the file (if configured).</li>
+                        <li><strong>Self-Correct:</strong> If an error is detected, it reads the error log and applies a fix automatically.</li>
+                        <li><strong>Finalize:</strong> It presents the final solution to you only after it passes internal checks.</li>
+                    </ol>
+
+                    <h3>Best For:</h3>
+                    <ul>
+                        <li>Unit test generation (Write test -> Run -> Fix -> Pass).</li>
+                        <li>Refactoring components that might break dependencies.</li>
+                        <li>Features spanning 2-3 related files.</li>
+                    </ul>
+                </section>
+
+                <section id="high-mode" class="section-block">
+                    <div class="breadcrumb">Work Modes / High Mode</div>
+                    <h1>High Mode</h1>
+                    <p><strong>The Architect.</strong> High Mode is our most advanced agentic workflow. It uses a "Plan-Execute-Review" architecture designed for large-scale changes.</p>
+
+                    <h3>The 3-Step Process:</h3>
+                    <div class="code-block-wrapper">
+                        <pre>
+1. PLANNING PHASE
+   - Scans the entire relevant project tree.
+   - Generates a markdown plan outlining every step.
+   - Asks for user approval before writing a single line of code.
+
+2. EXECUTION PHASE
+   - Executes the plan step-by-step.
+   - Maintains a "Global Memory" of changes to prevent circular edits.
+   - Handles massive context by chunking tasks.
+
+3. REVIEW PHASE
+   - Summarizes all changes.
+   - Runs integration tests.
+                        </pre>
+                    </div>
+
+                    <h3>Use Cases:</h3>
+                    <p>Use High Mode for migrations (e.g., "Convert this whole folder from JS to TypeScript"), scaffolding new microservices, or implementing complex algorithms.</p>
+                </section>
+
+                <section id="file-editing" class="section-block">
+                    <div class="breadcrumb">Core Capabilities / Real Code Editing</div>
+                    <h1>True Code Editing Capability</h1>
+                    <p>ode-code isn't just a chat bot; it's a file system agent. It can manipulate your project structure directly.</p>
+
+                    <h3>Capabilities</h3>
+                    <ul>
+                        <li><strong>Create/Delete/Modify:</strong> Full CRUD access to project files.</li>
+                        <li><strong>Diff View:</strong> Before applying any change, ode-code presents a unified diff (colored add/remove lines) so you can review exactly what will happen.</li>
+                        <li><strong>Undo Support:</strong> Made a mistake? The system supports undo operations to revert changes instantly.</li>
+                    </ul>
+                </section>
+
+                <section id="workflow" class="section-block">
+                    <div class="breadcrumb">Core Capabilities / Smart Workflow</div>
+                    <h1>Smart Workflow</h1>
+                    <p>ode-code integrates into your existing development environment without forcing you to change your tools.</p>
+
+                    <h3>The Loop</h3>
+                    <p>The typical workflow follows this pattern:</p>
+                    <ol>
+                        <li><strong>Context Gathering:</strong> You verify which files the AI sees using <code>/ls</code> or <code>/mention</code>.</li>
+                        <li><strong>Prompting:</strong> You describe the task using natural language.</li>
+                        <li><strong>Proposal:</strong> The AI proposes a shell command or a file edit.</li>
+                        <li><strong>Diff Review:</strong> You see a Green/Red diff of the proposed changes.</li>
+                        <li><strong>Confirmation:</strong> Press <code>Enter</code> to apply, or describe changes to refine.</li>
+                    </ol>
+
+                    <h3>Git Integration</h3>
+                    <p>ode-code is Git-aware. It can read your `.gitignore` to avoid scanning massive `node_modules` folders, and it can automatically stage or commit changes if you ask it to (e.g., "Fix this bug and commit with message 'fix login'").</p>
+                </section>
+
+                <section id="commands" class="section-block">
+                    <div class="breadcrumb">Core Capabilities / Commands & Tools</div>
+                    <h1>Special Commands & Features</h1>
+                    <p>Supercharge your workflow with these native CLI commands.</p>
+
+                    <h3>File Monitoring (<code>/watch</code>)</h3>
+                    <p>Real-time monitoring of file changes. If you edit a file in VS Code while ode-code is running, it will immediately notice the change and update its context.</p>
+
+                    <h3>Bug Hunter Mode (<code>/bug</code>)</h3>
+                    <p>Enter a specialized debugging workflow. Instead of writing code immediately, the agent will:</p>
+                    <ol>
+                        <li>Analyze the error stack trace.</li>
+                        <li>Read relevant files.</li>
+                        <li>Propose a hypothesis.</li>
+                        <li>Apply the fix upon confirmation.</li>
+                    </ol>
+
+                    <h3>Context Marking (<code>/mention</code>)</h3>
+                    <p>Similar to Slack or Discord, you can "mention" specific files to force the AI to pay attention to them. E.g., <code>/mention src/utils/auth.js</code>.</p>
+
+                    <h3>Command Execution</h3>
+                    <p>ode-code can run terminal commands for you, such as <code>npm test</code>, <code>git status</code>, or <code>ls -la</code>. It reads the output to understand the state of your project.</p>
+                </section>
+
+                <section id="interactive" class="section-block">
+                    <div class="breadcrumb">Experience & Safety / Interactive UX</div>
+                    <h1>Interactive User Experience</h1>
+                    <p>The CLI is built with <code>Ink</code> (React for CLI), providing a rich, dashboard-like experience inside your terminal.</p>
+
+                    <h3>Key UI Elements:</h3>
+                    <ul>
+                        <li><strong>Spinner & Progress Bars:</strong> Visual feedback during long-running High Mode tasks so you know the agent hasn't frozen.</li>
+                        <li><strong>Syntax Highlighting:</strong> All code output is syntax-highlighted for readability.</li>
+                        <li><strong>Selectable Menus:</strong> When the AI needs you to choose a file or an option, use your Arrow Keys to navigate and Enter to select.</li>
+                    </ul>
+
+                    <h3>Keyboard Shortcuts</h3>
+                    <table>
+                        <tr>
+                            <th>Key</th>
+                            <th>Action</th>
+                        </tr>
+                        <tr>
+                            <td><code>Tab</code></td>
+                            <td>Toggle "Deep Thinking" (Reasoning Model)</td>
+                        </tr>
+                        <tr>
+                            <td><code>Ctrl + C</code></td>
+                            <td>Interrupt current generation (Cancel)</td>
+                        </tr>
+                        <tr>
+                            <td><code>Up / Down</code></td>
+                            <td>Navigate command history</td>
+                        </tr>
+                    </table>
+                </section>
+
+                <section id="safety" class="section-block">
+                    <div class="breadcrumb">Experience & Safety / Safety & Logs</div>
+                    <h1>Safety & Reliability</h1>
+                    <p>Giving an AI access to your file system requires trust. We've built strict guardrails to prevent accidents.</p>
+
+                    <h3>Permission Tiers</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Action Type</th>
+                                <th>Default Behavior</th>
+                                <th>Configurable?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Read Files</strong></td>
+                                <td>Allowed</td>
+                                <td>Yes (via .gitignore)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Create Files</strong></td>
+                                <td>Auto-allowed</td>
+                                <td>Yes</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Edit Files</strong></td>
+                                <td><strong>Requires Confirmation (Y/n)</strong></td>
+                                <td>Yes (Can set to Auto)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Delete Files</strong></td>
+                                <td><strong>Strict Confirmation Required</strong></td>
+                                <td>No (Always strict)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Shell Commands</strong></td>
+                                <td>Requires Confirmation</td>
+                                <td>Yes</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Audit Logs</h3>
+                    <p>Every session creates a local log file in <code>./.ode-code/logs/</code>. This JSON file contains the full conversation history, prompt usage, and file modifications for auditing purposes.</p>
+                </section>
+                
+                <section id="config" class="section-block">
+                    <div class="breadcrumb">Experience & Safety / Configuration</div>
+                    <h1>Workspace Configuration</h1>
+                    <p>You can customize how ode-code behaves in your specific project by creating an <code>ode-code.md</code> file in the root directory.</p>
+                    <p>This file acts as a "System Prompt" for your project. The AI reads this before every request.</p>
+
+                    <h3>Example <code>ode-code.md</code></h3>
+                    <div class="code-block-wrapper">
+                        <div class="code-header">ode-code.md</div>
+                        <pre>
+# Project Rules
+
+## Coding Style
+- Use Functional Components for React.
+- Always use Tailwind CSS for styling.
+- Prefer `const` over `let`.
+- No `any` types in TypeScript.
+
+## Architecture
+- All API calls must go through `@/services/api`.
+- Components should be placed in `src/components/domains/{domainName}`.
+
+## Ignored
+- Do not read files in `legacy/` folder.
+                        </pre>
+                    </div>
+                    <p>Use the <code>/init</code> command to have ode-code analyze your project and generate a starting `ode-code.md` automatically.</p>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <a href="#" class="ask-docs-btn" style="text-decoration: none; display: flex; align-items: center; gap: 8px;">
+        Ask AI
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 19.477 5.754 20 7.5 20s3.332-.477 4.5-1.253m0-12.5c1.168-.776 2.754-1.253 4.5-1.253s3.332.477 4.5 1.253v13C19.832 19.477 18.247 20 16.5 20s-3.332-.477-4.5-1.253"></path></svg>
+    </a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            /* ----------------------------------------------------------------
+               1. Typewriter Animation Logic
+            ---------------------------------------------------------------- */
+            const words = ["debug", "deploy", "refactor", "optimize", "scale"];
+            const textElement = document.getElementById("typewriter");
+            let wordIndex = 0;
+            let charIndex = 0;
+            let isDeleting = false;
+            let typeSpeed = 100;
+
+            function type() {
+                const currentWord = words[wordIndex];
+                
+                if (isDeleting) {
+                    textElement.textContent = currentWord.substring(0, charIndex - 1);
+                    charIndex--;
+                    typeSpeed = 50; // Deleting is faster
+                } else {
+                    textElement.textContent = currentWord.substring(0, charIndex + 1);
+                    charIndex++;
+                    typeSpeed = 150; // Typing speed
+                }
+
+                if (!isDeleting && charIndex === currentWord.length) {
+                    // Finished typing word, pause before deleting
+                    isDeleting = true;
+                    typeSpeed = 2000; 
+                } else if (isDeleting && charIndex === 0) {
+                    // Finished deleting, move to next word
+                    isDeleting = false;
+                    wordIndex = (wordIndex + 1) % words.length;
+                    typeSpeed = 500;
+                }
+
+                setTimeout(type, typeSpeed);
+            }
+
+            // Start animation if element exists (only on Overview page)
+            if (textElement) {
+                type();
+            }
+
+            /* ----------------------------------------------------------------
+               2. Copy Button Logic
+            ---------------------------------------------------------------- */
+            const copyBtn = document.getElementById('copyBtn');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', async function() {
+                    const code = "npm install -g @tyloai/ode-code@latest";
+                    
+                    try {
+                        await navigator.clipboard.writeText(code);
+                        
+                        // Icon Swap Logic
+                        const copyIcon = this.querySelector('.copy-icon');
+                        const checkIcon = this.querySelector('.check-icon');
+                        
+                        // Hide copy, show check
+                        copyIcon.classList.remove('visible-icon');
+                        copyIcon.classList.add('hidden-icon');
+                        checkIcon.classList.remove('hidden-icon');
+                        checkIcon.classList.add('visible-icon');
+
+                        // Revert after 2 seconds
+                        setTimeout(() => {
+                            checkIcon.classList.remove('visible-icon');
+                            checkIcon.classList.add('hidden-icon');
+                            copyIcon.classList.remove('hidden-icon');
+                            copyIcon.classList.add('visible-icon');
+                        }, 2000);
+
+                    } catch (err) {
+                        console.error('Failed to copy text: ', err);
+                    }
+                });
+            }
+
+            /* ----------------------------------------------------------------
+               3. General UI Logic (Search, Nav, Tabs)
+            ---------------------------------------------------------------- */
+            const searchInput = document.getElementById('sidebar-search');
+            const navGroups = document.querySelectorAll('.nav-group');
+            const navItems = document.querySelectorAll('.nav-item[data-target]');
+            const sections = document.querySelectorAll('.section-block');
+            const mainContent = document.querySelector('.main-content');
+
+            // Switch Section Logic
+            function switchToSection(targetId) {
+                sections.forEach(sec => sec.classList.remove('active'));
+                
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                    mainContent.scrollTop = 0;
+                }
+
+                navItems.forEach(item => {
+                    if(item.getAttribute('data-target') === targetId) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+            }
+
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    if(targetId) {
+                        switchToSection(targetId);
+                    }
+                });
+            });
+
+            // Search Logic
+            document.addEventListener('keydown', function(e) {
+                if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                    e.preventDefault();
+                    searchInput.focus();
+                }
+            });
+
+            searchInput.addEventListener('focus', function() { document.querySelector('.search-box').classList.add('focus'); });
+            searchInput.addEventListener('blur', function() { document.querySelector('.search-box').classList.remove('focus'); });
+
+            searchInput.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase().trim();
+
+                navGroups.forEach(group => {
+                    let hasVisibleItems = false;
+                    const itemsInGroup = group.querySelectorAll('.nav-item');
+
+                    itemsInGroup.forEach(item => {
+                        const itemText = item.textContent.toLowerCase();
+                        if (itemText.includes(searchTerm) && searchTerm) {
+                            item.classList.remove('hidden');
+                            hasVisibleItems = true;
+                            const regex = new RegExp(`(${searchTerm})`, 'gi');
+                            item.innerHTML = item.textContent.replace(regex, '<mark style="background-color: #D97757; color: white; padding: 2px 4px; border-radius: 2px;">$1</mark>');
+                        } else {
+                            item.classList.add('hidden');
+                            item.innerHTML = item.textContent;
+                        }
+                    });
+
+                    if (hasVisibleItems) {
+                        group.classList.remove('hidden');
+                    } else {
+                        group.classList.add('hidden');
+                    }
+                });
+            });
+            
+            // Next Button Logic
+             const allSections = Array.from(document.querySelectorAll('.section-block'));
+            function addNextButton() {
+                allSections.forEach((section, index) => {
+                    if (index < allSections.length - 1) {
+                        const nextSection = allSections[index + 1];
+                        const nextId = nextSection.id;
+                        const nextTitle = nextSection.querySelector('h1')?.textContent || 'Next Page';
+                        
+                        const button = document.createElement('div');
+                        button.style.cssText = `
+                            display: flex;
+                            align-items: center;
+                            justify-content: flex-end;
+                            gap: 12px;
+                            margin-top: 60px;
+                            padding-top: 40px;
+                            border-top: 1px solid var(--border-color);
+                        `;
+                        
+                        button.innerHTML = `
+                            <span style="color: var(--text-secondary); font-size: 14px;">Next Page</span>
+                            <button class="next-btn-nav" data-target="${nextId}"
+                                style="
+                                background: var(--accent-color);
+                                color: white;
+                                border: none;
+                                padding: 8px 16px;
+                                border-radius: 6px;
+                                cursor: pointer;
+                                font-weight: 500;
+                                transition: all 0.2s;
+                                "
+                                onmouseover="this.style.transform='translateY(-2px)'"
+                                onmouseout="this.style.transform='translateY(0)'"
+                            >
+                                ${nextTitle} →
+                            </button>
+                        `;
+                        
+                        section.appendChild(button);
+                    }
+                });
+
+                document.querySelectorAll('.next-btn-nav').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const targetId = this.getAttribute('data-target');
+                        switchToSection(targetId);
+                    });
+                });
+            }
+            addNextButton();
+        });
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const htmlElement = document.documentElement;
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        htmlElement.setAttribute('data-theme', savedTheme);
+
+        themeToggle.addEventListener('click', function() {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

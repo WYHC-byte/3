@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build with TyloAI</title>
+    <style>
+        :root {
+            /* Shared Variables from docs.html */
+            --bg-color: #131316;
+            --sidebar-bg: #131316;
+            --text-primary: #EDEDED;
+            --text-secondary: #9CA3AF;
+            --accent-color: #D97757;
+            --border-color: #27272A;
+            --hover-bg: #27272A;
+            --link-color: #60A5FA;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --card-hover-border: #3F3F46;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-family);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- Header (Copied from docs.html for consistency) --- */
+        header {
+            height: 60px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            background-color: var(--bg-color);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        
+        .logo-img {
+            width: 24px;
+            height: 24px;
+            color: var(--accent-color);
+            flex-shrink: 0;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            align-items: center;
+            height: 100%;
+        }
+
+        .header-nav a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            padding: 6px 12px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            height: 32px;
+        }
+
+        .header-nav a:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .header-nav a.active {
+            color: var(--text-primary);
+            background: #27272A;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 14px;
+        }
+
+        .login-btn {
+            background: #E5E7EB;
+            color: #000;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* --- Main Hero Section --- */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 56px;
+            font-weight: 400; /* Serif style often looks thinner/elegant */
+            font-family: 'Playfair Display', serif; /* Optional: matches the vibe of the screenshot */
+            margin-bottom: 24px;
+            text-align: center;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 20px;
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 600px;
+            line-height: 1.5;
+            margin-bottom: 48px;
+        }
+
+        /* --- Search Bar --- */
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 640px;
+            margin-bottom: 80px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: #27272A;
+            border: 1px solid #3F3F46;
+            color: white;
+            padding: 16px 48px;
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--text-secondary);
+            background: #2D2D32;
+            box-shadow: 0 0 0 2px rgba(255,255,255,0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        .search-shortcut {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 12px;
+            border: 1px solid #52525B;
+            padding: 2px 6px;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        /* --- Cards Grid --- */
+        .section-title {
+            font-size: 24px;
+            margin-bottom: 32px;
+            font-weight: 400;
+            font-family: serif;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            width: 100%;
+        }
+
+        .card {
+            background: #18181B;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            min-height: 180px;
+        }
+
+        .card:hover {
+            border-color: var(--text-secondary);
+            transform: translateY(-2px);
+            background: #202023;
+        }
+
+        .card-icon {
+            margin-bottom: 16px;
+            color: #60A5FA; /* Blueish */
+        }
+
+        .card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 36px; }
+            .card-grid { grid-template-columns: 1fr; }
+            .subtitle { font-size: 16px; padding: 0 20px; }
+            .search-wrapper { padding: 0 20px; }
+        }
+    </style>
+</head>
+<body>
+
+        <header>
+        <div class="header-left">
+            <svg class="logo-img" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <mask id="cutout-mask">
+                        <rect x="0" y="0" width="100" height="100" fill="white" />
+                        <path d="M -10,34 H 38 Q 58,34 58,54 V 58 Q 58,78 78,78 H 82" fill="none" stroke="black" stroke-width="18" stroke-linecap="round" />
+                    </mask>
+                </defs>
+                <rect width="100" height="100" fill="currentColor" mask="url(#cutout-mask)" />
+            </svg>
+            <span>TyloAI Docs</span>
+        </div>
+
+        <nav class="header-nav">
+            <a href="index.html" class="active">Home</a>
+            <a href="docs.html">Docs</a>
+            <a href="release-notes.html">Release Notes</a>
+            <a href="https://modelcontextprotocol.io">MCP ↗</a>
+            <a href="ode-code.html">ode-code CLI docs</a>
+        </nav>
+        <div class="header-right">
+            <button id="theme-toggle" 
+                style="
+                background: none;
+                border: 1px solid var(--border-color);
+                color: var(--text-secondary);
+                width: 32px;
+                height: 32px;
+                border-radius: 6px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s;
+                "
+                onmouseover="this.style.background='rgba(255,255,255,0.05)'"
+                onmouseout="this.style.background='none'"
+            >
+                <svg id="theme-icon" width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11 10.07 7.5 12 7.5s3.5 1.57 3.5 3.5z"/>
+                </svg>
+            </button>
+            <span>English</span>
+            <a href="https://tyloai.com" class="login-btn">Login</a>
+        </div>
+    </header>
+
+    <main>
+        <h1>Build with TyloAI</h1>
+        <p class="subtitle">Learn how to get started with the TyloAI Developer Platform and ode-code CLI tool.</p>
+
+        <div class="search-wrapper">
+            <svg class="search-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            <input type="text" id="home-search" class="search-input" placeholder="Ask TyloAI about docs..." autocomplete="off">
+            <span class="search-shortcut">⌘K</span>
+        </div>
+
+        <h2 class="section-title">TyloAI Developer Platform</h2>
+
+        <div class="card-grid">
+            <a href="docs.html#quickstart" class="card">
+                <div class="card-icon">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h3>Get started</h3>
+                <p>Make your first API call in minutes using the ode-code CLI or standard libraries.</p>
+            </a>
+
+            <a href="docs.html#models-overview" class="card">
+                <div class="card-icon">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                    </svg>
+                </div>
+                <h3>Features overview</h3>
+                <p>Explore the advanced features and capabilities now available in TyloAI models.</p>
+            </a>
+
+            <a href="docs.html#ode-7-new" class="card">
+                <div class="card-icon">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                </div>
+                <h3>What's new in Ode-7</h3>
+                <p>Discover the latest advancements in the Ode-7 family of models.</p>
+            </a>
+        </div>
+
+        <h2 class="section-title" style="margin-top: 64px;">ode-code CLI</h2>
+
+        <div class="card-grid">
+            <a href="ode-code.html#quickstart" class="card">
+                <div class="card-icon">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <h3>ode-code quickstart</h3>
+                <p>Get started with ode-code.</p>
+            </a>
+
+            <a href="ode-code.html" class="card">
+                <div class="card-icon">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                    </svg>
+                </div>
+                <h3>ode-code</h3>
+                <p>Explore ode-code CLI.</p>
+            </a>
+
+            <a href="ode-code.html#reference" class="card">
+                <div class="card-icon">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                    </svg>
+                </div>
+                <h3>ode-code reference</h3>
+                <p>Explore the full command line interface reference.</p>
+            </a>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('home-search');
+
+            // 1. Search Logic: Redirect to search.html on Enter
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const query = searchInput.value.trim();
+                    if (query) {
+                        // Encode query to handle special characters safely
+                        window.location.href = `search.html?q=${encodeURIComponent(query)}`;
+                    }
+                }
+            });
+
+            // 2. Shortcut Logic: Cmd/Ctrl + K to focus search
+            document.addEventListener('keydown', (e) => {
+                if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                    e.preventDefault(); // Prevent browser default (e.g., search bar focus)
+                    searchInput.focus();
+                }
+            });
+            
+            // 3. Simple theme toggle logic (Matches logic in docs.html)
+            const themeToggle = document.getElementById('theme-toggle');
+            themeToggle.addEventListener('click', () => {
+                const html = document.documentElement;
+                const current = html.getAttribute('data-theme');
+                const next = current === 'dark' ? 'light' : 'dark';
+                html.setAttribute('data-theme', next);
+                
+                // Optional: Save to localStorage if you want persistence across pages
+                // localStorage.setItem('theme', next);
+            });
+        });
+    </script>
+</body>
+</html>

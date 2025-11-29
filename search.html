@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search - TyloAI Documentation</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Inter', sans-serif;
+            --transition-speed: 0.3s;
+        }
+
+        html[data-theme='light'] {
+            --bg-color: #fafafa;
+            --text-color: #111111;
+            --secondary-text-color: #666666;
+            --border-color: #e0e0e0;
+            --input-bg-color: #ffffff;
+            --button-accent-bg: #111111;
+            --button-accent-text: #ffffff;
+            --card-bg: #ffffff;
+            --accent-color: #667eea;
+            --code-bg: #f5f5f5;
+        }
+
+        html[data-theme='dark'] {
+            --bg-color: #0a0a0a;
+            --text-color: #eeeeee;
+            --secondary-text-color: #999999;
+            --border-color: #2a2a2a;
+            --input-bg-color: #1a1a1a;
+            --button-accent-bg: #eeeeee;
+            --button-accent-text: #111111;
+            --card-bg: #151515;
+            --accent-color: #667eea;
+            --code-bg: #1a1a1a;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header */
+        .main-header {
+            width: 100%;
+            background-color: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-button {
+            cursor: pointer;
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: var(--text-color);
+            transition: all var(--transition-speed) ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .back-button:hover {
+            background-color: var(--card-bg);
+            transform: translateX(-4px);
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px;
+            color: var(--text-color);
+            transition: all var(--transition-speed) ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: auto;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--card-bg);
+            transform: rotate(20deg);
+        }
+
+        .theme-toggle .icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        html[data-theme='dark'] .sun-icon { display: block; }
+        html[data-theme='dark'] .moon-icon { display: none; }
+        html[data-theme='light'] .sun-icon { display: none; }
+        html[data-theme='light'] .moon-icon { display: block; }
+
+        /* Main Container */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 60px 30px;
+        }
+
+        .search-header {
+            margin-bottom: 48px;
+            text-align: center;
+        }
+
+        .search-header h1 {
+            font-family: var(--font-serif);
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+
+        .search-box-container {
+            position: relative;
+            margin-bottom: 32px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 1.05rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background-color: var(--input-bg-color);
+            color: var(--text-color);
+            transition: all var(--transition-speed) ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-info {
+            color: var(--secondary-text-color);
+            font-size: 0.9rem;
+            margin-top: 12px;
+        }
+
+        /* Results */
+        .results-section {
+            margin-bottom: 40px;
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .results-header h2 {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .result-count {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .result-item {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            border-color: var(--accent-color);
+        }
+
+        .result-item h3 {
+            font-family: var(--font-serif);
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: var(--accent-color);
+        }
+
+        .result-category {
+            display: inline-block;
+            background-color: rgba(102, 126, 234, 0.1);
+            color: var(--accent-color);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .result-excerpt {
+            color: var(--secondary-text-color);
+            line-height: 1.6;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .result-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .result-link:hover {
+            gap: 10px;
+        }
+
+        .highlight {
+            background-color: rgba(102, 126, 234, 0.25);
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+
+        /* No Results */
+        .no-results {
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .no-results h2 {
+            font-family: var(--font-serif);
+            font-size: 1.8rem;
+            margin-bottom: 16px;
+        }
+
+        .no-results p {
+            color: var(--secondary-text-color);
+            font-size: 1rem;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        .ai-prompt-button {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-color), #764ba2);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 12px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            text-decoration: none;
+            margin-top: 16px;
+        }
+
+        .ai-prompt-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            gap: 12px;
+            color: var(--secondary-text-color);
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--accent-color);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .search-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .result-item {
+                padding: 16px;
+            }
+
+            .result-item h3 {
+                font-size: 1.05rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-content">
+            <button class="back-button" id="backBtn" title="Go back">
+                ← Back
+            </button>
+            <span style="color: var(--secondary-text-color); font-size: 0.9rem;">Documentation Search</span>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                <svg class="icon sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a6 6 0 119 0 6 6 0 01-9 0zM18.894 6.106a.75.75 0 010 1.06l-1.591 1.59a.75.75 0 11-1.06-1.06l1.59-1.59a.75.75 0 011.06 0zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.803 17.803a.75.75 0 01-1.06 0l-1.59-1.591a.75.75 0 111.06-1.06l1.59 1.59a.75.75 0 010 1.06zM12 21.75a.75.75 0 01-.75-.75v-2.25a.75.75 0 011.5 0V21a.75.75 0 01-.75.75zM5.106 18.894a.75.75 0 010-1.06l1.59-1.59a.75.75 0 111.06 1.06l-1.59 1.59a.75.75 0 01-1.06 0zM3 12a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H3.75A.75.75 0 013 12zM6.106 5.106a.75.75 0 011.06 0l1.59 1.591a.75.75 0 11-1.06 1.06l-1.59-1.59a.75.75 0 010-1.06z"/></svg>
+                <svg class="icon moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-3.836 2.04-7.171 5.008-8.972a.75.75 0 01.82.162z" clip-rule="evenodd" /></svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="search-header">
+            <h1>Search Documentation</h1>
+            <p style="color: var(--secondary-text-color); font-size: 1rem;">Find answers to your questions about TyloAI</p>
+        </div>
+
+        <div class="search-box-container">
+            <input 
+                type="text" 
+                id="searchInput" 
+                class="search-input" 
+                placeholder="Search docs... (e.g., 'how to use extended thinking', 'API pricing', 'web search')"
+                autocomplete="off"
+            >
+            <div class="search-info">
+                💡 Tip: Search for features, pricing, API docs, and more
+            </div>
+        </div>
+
+        <div id="resultsContainer"></div>
+    </div>
+
+    <script>
+        // Comprehensive documentation database
+        // Comprehensive documentation database
+        const docsDatabase = [
+            // --- Getting Started & Intro (docs.html) ---
+            {
+                id: 'docs.html#intro',
+                title: 'Introduction to TyloAI',
+                category: 'Getting Started',
+                keywords: ['introduction', 'welcome', 'platform', 'ode-7', 'regions', 'latency'],
+                excerpt: 'TyloAI is a high-performance AI platform featuring the Ode-7 model family (Reasoning, Core, Flash).',
+                content: 'Overview of TyloAI mission, supported regions (NA, EU, APAC), and the core model lineup.'
+            },
+            {
+                id: 'docs.html#quickstart',
+                title: 'Quick Start Guide',
+                category: 'Getting Started',
+                keywords: ['quick start', 'install', 'npm', 'login', 'api key', 'first project'],
+                excerpt: 'Get started building with TyloAI in minutes using the global CLI tool.',
+                content: 'Step-by-step guide: Global installation via npm, logging in via terminal, and generating your first personal website code.'
+            },
+
+            // --- Models & Pricing (docs.html) ---
+            {
+                id: 'docs.html#models-overview',
+                title: 'Models Overview',
+                category: 'Models',
+                keywords: ['models', 'ode-7', 'ode-7-reasoning', 'ode-7-flash', 'comparison', 'matrix'],
+                excerpt: 'TyloAI offers varied models: Ode-7-Reasoning (Flagship), Ode-7 (Universal Core), and Ode-7-Flash (Speed).',
+                content: 'Detailed comparison table of models, pricing credits, deep thinking capabilities, and latency.'
+            },
+            {
+                id: 'docs.html#choosing-model',
+                title: 'Choosing the Right Model',
+                category: 'Models',
+                keywords: ['selection', 'choose', 'guide', 'capability', 'speed', 'cost', 'tradeoff'],
+                excerpt: 'A framework for balancing capability, speed, and cost to select the optimal model.',
+                content: 'Strategies for starting with Flash vs. Powerful models, and a selection matrix for specific use cases like coding agents or scientific analysis.'
+            },
+            {
+                id: 'docs.html#ode-7-new',
+                title: 'What\'s New in Ode-7 Family',
+                category: 'Models',
+                keywords: ['ode-7', 'new features', 'post-thinking', 'reasoning', 'evolution', 'metacognitive'],
+                excerpt: 'Ode-7 marks a transition from prediction to reasoning with autonomous self-correction.',
+                content: 'Deep semantic understanding, complex instruction following, and the revolutionary Post-Thinking cognitive loop.'
+            },
+            {
+                id: 'docs.html#deprecations',
+                title: 'Model Lifecycle & Deprecation',
+                category: 'Models',
+                keywords: ['deprecation', 'eol', 'retired', 'maintenance', 'ode-5', 'ode-6', 'legacy'],
+                excerpt: 'Policy on model retirement. Ode-5 is retired; Ode-6 is in maintenance mode.',
+                content: 'Timeline for End of Life (EOL), risks of using "latest" aliases, and migration recommendations.'
+            },
+            {
+                id: 'docs.html#web-pricing',
+                title: 'Web Platform Pricing',
+                category: 'Pricing',
+                keywords: ['pricing', 'subscription', 'free', 'pro', 'max', 'credits', 'unlimited'],
+                excerpt: 'Flexible plans: Free (Starter), Pro (Professional), and Max (Unlimited Power User).',
+                content: 'Details on daily credits, monthly recovery, priority support, and fair use policies for the Max plan.'
+            },
+
+            // --- CLI Tool (ode-code.html) ---
+            {
+                id: 'ode-code.html#overview',
+                title: 'ode-code CLI Overview',
+                category: 'CLI',
+                keywords: ['ode-code', 'cli', 'terminal', 'agent', 'install', 'npm'],
+                excerpt: 'Unleash TyloAI\'s raw power directly in your terminal. Build, refactor, and deploy.',
+                content: 'Introduction to the CLI tool, installation commands, and connection to the Ode-7 model.'
+            },
+            {
+                id: 'ode-code.html#quickstart',
+                title: 'CLI Quick Start',
+                category: 'CLI',
+                keywords: ['cli setup', 'login', 'init', 'first run'],
+                excerpt: 'Initialize the agent, log in via browser, and start your first coding session.',
+                content: 'Commands to install, login, and basic usage of "ode code" in your project directory.'
+            },
+            {
+                id: 'ode-code.html#pricing',
+                title: 'CLI Pricing & Credits',
+                category: 'Pricing',
+                keywords: ['cli cost', 'pricing', 'credits', 'consumption', 'modes cost'],
+                excerpt: 'CLI consumption rates based on modes: Flash (1x), Medium (5x), High (10-20x).',
+                content: 'Cost factors for different velocity modes and Deep Thinking usage within the terminal.'
+            },
+            {
+                id: 'ode-code.html#modes-overview',
+                title: 'CLI Work Modes',
+                category: 'CLI',
+                keywords: ['modes', 'flash', 'medium', 'high', 'velocity', 'agentic loop'],
+                excerpt: 'Three distinct modes: Flash (Quick), Medium (Balanced Iterator), and High (Architect).',
+                content: 'Overview of switching modes using /mode and their specific use cases.'
+            },
+            {
+                id: 'ode-code.html#flash-mode',
+                title: 'Flash Mode (CLI)',
+                category: 'CLI',
+                keywords: ['flash mode', 'quick', 'single-turn', 'fast'],
+                excerpt: 'Optimized for low-latency, single-turn tasks like fixing typos or quick queries.',
+                content: 'Details on Flash mode context window, reasoning speed, and lack of iteration.'
+            },
+            {
+                id: 'ode-code.html#medium-mode',
+                title: 'Medium Mode (CLI)',
+                category: 'CLI',
+                keywords: ['medium mode', 'iterator', 'self-correct', 'verify', 'agent'],
+                excerpt: 'The Balanced Iterator. Writes code, runs it, checks errors, and fixes itself.',
+                content: 'Explanation of the Draft -> Verify -> Self-Correct -> Finalize loop.'
+            },
+            {
+                id: 'ode-code.html#high-mode',
+                title: 'High Mode (CLI)',
+                category: 'CLI',
+                keywords: ['high mode', 'architect', 'planning', 'complex', 'migration'],
+                excerpt: 'The Architect. Plan-Execute-Review architecture for large-scale changes.',
+                content: 'Deep planning phase, global memory of changes, and handling massive context.'
+            },
+            {
+                id: 'ode-code.html#commands',
+                title: 'CLI Commands & Tools',
+                category: 'CLI',
+                keywords: ['commands', '/watch', '/bug', '/mention', 'debugging', 'monitoring'],
+                excerpt: 'Native CLI commands like /watch for file monitoring and /bug for debugging.',
+                content: 'Usage of /watch, /bug (Bug Hunter mode), /mention (context marking), and shell execution.'
+            },
+            {
+                id: 'ode-code.html#config',
+                title: 'Workspace Configuration',
+                category: 'CLI',
+                keywords: ['config', 'ode-code.md', 'rules', 'system prompt', 'customization'],
+                excerpt: 'Customize behavior using an ode-code.md file in your project root.',
+                content: 'Setting coding styles, architecture rules, and ignored files via ode-code.md.'
+            },
+
+            // --- Capabilities (docs.html) ---
+            {
+                id: 'docs.html#prompt-caching',
+                title: 'Prompt Caching',
+                category: 'Capabilities',
+                keywords: ['caching', 'context', 'latency', 'cost saving', 'ephemeral'],
+                excerpt: 'Reduce latency and save up to 90% costs by caching repeated context.',
+                content: 'How to use cache_control type ephemeral for large documents and system prompts.'
+            },
+            {
+                id: 'docs.html#extended-thinking',
+                title: 'Extended & Post-Thinking',
+                category: 'Capabilities',
+                keywords: ['extended thinking', 'post-thinking', 'cot', 'reasoning', 'self-reflection', 'metacognitive'],
+                excerpt: 'Enable invisible deep reasoning chains and retroactive self-review.',
+                content: 'Standard Thinking vs. Post-Thinking (interleaved reflection), API usage with -thinking suffixes.'
+            },
+            {
+                id: 'docs.html#streaming',
+                title: 'Streaming Messages',
+                category: 'Capabilities',
+                keywords: ['streaming', 'sse', 'real-time', 'low latency', 'api'],
+                excerpt: 'Receive data progressively for a "typewriter" style real-time experience.',
+                content: 'Implementation using stream: true, compatible with OpenAI SDK.'
+            },
+            {
+                id: 'docs.html#batching',
+                title: 'Batching & High Concurrency',
+                category: 'Capabilities',
+                keywords: ['batching', 'concurrency', 'throughput', 'rate limits', 'queue'],
+                excerpt: 'Handle high-intensity workloads with stable high concurrency support.',
+                content: 'Building concurrency queues and managing API rate limits.'
+            },
+            {
+                id: 'docs.html#citations',
+                title: 'Precise Citations',
+                category: 'Capabilities',
+                keywords: ['citations', 'rag', 'sources', 'verification', 'anchors'],
+                excerpt: 'Native citation capabilities to trace generated content back to source documents.',
+                content: 'Citation format ^[1]^ and frontend rendering guides.'
+            },
+            {
+                id: 'docs.html#multilingual',
+                title: 'Multilingual Support',
+                category: 'Capabilities',
+                keywords: ['multilingual', 'languages', 'translation', 'cultural', 'japanese', 'chinese'],
+                excerpt: 'Comprehensive support for global languages and cultural nuances.',
+                content: 'Handling Japanese honorifics, Chinese idioms, and programming languages.'
+            },
+            {
+                id: 'docs.html#web-search',
+                title: 'Web Search Integration',
+                category: 'Capabilities',
+                keywords: ['web search', 'internet', 'rag', 'real-time', 'search agent'],
+                excerpt: 'Break knowledge cutoffs with powerful web search capabilities.',
+                content: 'Enabling on web vs. implementing Search Agent pattern via API.'
+            },
+            {
+                id: 'docs.html#artifacts',
+                title: 'Artifacts',
+                category: 'Capabilities',
+                keywords: ['artifacts', 'ui', 'preview', 'html', 'react', 'interactive'],
+                excerpt: 'Interactive digital canvas for running generated apps alongside chat.',
+                content: 'Instant rendering, one-click debugging, and context interaction for UI building.'
+            },
+
+            // --- Prompt Engineering (docs.html) ---
+            {
+                id: 'docs.html#prompt-overview',
+                title: 'Prompt Engineering Overview',
+                category: 'Prompt Engineering',
+                keywords: ['prompt engineering', 'guide', 'principles', 'specificity'],
+                excerpt: 'The art of optimizing input text to guide AI for better output.',
+                content: 'Core principles: Specificity, Context, and Constraints.'
+            },
+            {
+                id: 'docs.html#prompt-generator',
+                title: 'Prompt Generator',
+                category: 'Prompt Engineering',
+                keywords: ['generator', 'meta-prompting', 'tool', 'optimize'],
+                excerpt: 'Turn simple intentions into production-grade prompts using meta-prompting.',
+                content: 'How to use the built-in generator for customer service bots, data analysis, etc.'
+            },
+            {
+                id: 'docs.html#prompt-templates',
+                title: 'Prompt Templates',
+                category: 'Prompt Engineering',
+                keywords: ['templates', 'library', 'examples', 'code review'],
+                excerpt: 'Battle-tested prompts for coding, writing, and business scenarios.',
+                content: 'Library of templates and examples like the Code Review Expert.'
+            },
+            {
+                id: 'docs.html#prompt-improver',
+                title: 'Prompt Improver',
+                category: 'Prompt Engineering',
+                keywords: ['improver', 'analysis', 'denoising', 'enhancement'],
+                excerpt: 'Automated tool to analyze and improve prompt quality.',
+                content: 'Features like automatic denoising, structure enhancement, and redundancy detection.'
+            },
+            {
+                id: 'docs.html#cot',
+                title: 'Chain of Thought (CoT)',
+                category: 'Prompt Engineering',
+                keywords: ['cot', 'reasoning', 'step by step', 'logic'],
+                excerpt: 'Guide models to show thinking process for complex tasks.',
+                content: 'Implementation methods ("Let\'s think step by step") and variants.'
+            },
+            {
+                id: 'docs.html#xml-tags',
+                title: 'Using XML Tags',
+                category: 'Prompt Engineering',
+                keywords: ['xml', 'tags', 'structure', 'parsing'],
+                excerpt: 'Structure prompts using XML tags to improve signal-to-noise ratio.',
+                content: 'Best practices for using <context>, <task>, <instructions>, etc.'
+            },
+            {
+                id: 'docs.html#hallucinations',
+                title: 'Reducing Hallucinations',
+                category: 'Prompt Engineering',
+                keywords: ['hallucinations', 'accuracy', 'verification', 'citations'],
+                excerpt: 'Strategies to control fabrication and improve factual accuracy.',
+                content: 'Techniques like allowing "I don\'t know", requiring citations, and lowering temperature.'
+            },
+            {
+                id: 'docs.html#leakage',
+                title: 'Reducing Prompt Leakage',
+                category: 'Prompt Engineering',
+                keywords: ['security', 'injection', 'leakage', 'defense', 'safety'],
+                excerpt: 'Defend against prompt injection and intellectual property theft.',
+                content: 'Sandwich defense, XML isolation, and input sanitization strategies.'
+            },
+
+            // --- Release Notes (release-notes.html) ---
+            {
+                id: 'release-notes.html#overview',
+                title: 'Release Notes & History',
+                category: 'Updates',
+                keywords: ['release notes', 'changelog', 'updates', 'history', 'news'],
+                excerpt: 'Track the evolution of TyloAI platform and tools.',
+                content: 'History including Ode-7 launch, CLI v2.1, Extended Thinking Beta, and more.'
+            }
+        ];
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const htmlEl = document.documentElement;
+
+        const applyTheme = (theme) => {
+            htmlEl.setAttribute('data-theme', theme);
+            sessionStorage.setItem('theme', theme);
+        };
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = htmlEl.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            applyTheme(newTheme);
+        });
+
+        const storedTheme = sessionStorage.getItem('theme') || 'dark';
+        applyTheme(storedTheme);
+
+        // Back Button
+        document.getElementById('backBtn').addEventListener('click', () => {
+            window.history.back();
+        });
+
+        // Get search query from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchQuery = urlParams.get('q') || '';
+        const searchInput = document.getElementById('searchInput');
+        const resultsContainer = document.getElementById('resultsContainer');
+
+        searchInput.value = decodeURIComponent(searchQuery);
+
+        // Search Function
+        function performSearch(query) {
+            if (!query.trim()) {
+                resultsContainer.innerHTML = `
+                    <div class="no-results">
+                        <h2>Start Searching</h2>
+                        <p>Enter a search term to find documentation about TyloAI features, pricing, capabilities, and more.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const lowerQuery = query.toLowerCase();
+            const results = docsDatabase.filter(doc => {
+                const matchTitle = doc.title.toLowerCase().includes(lowerQuery);
+                const matchExcerpt = doc.excerpt.toLowerCase().includes(lowerQuery);
+                const matchContent = doc.content.toLowerCase().includes(lowerQuery);
+                const matchKeywords = doc.keywords.some(kw => kw.includes(lowerQuery));
+                
+                return matchTitle || matchExcerpt || matchContent || matchKeywords;
+            });
+
+            displayResults(results, query);
+        }
+
+        // Display Results
+        function displayResults(results, query) {
+            if (results.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="no-results">
+                        <h2>No Results Found</h2>
+                        <p>We couldn't find documentation matching "<strong>${escapeHtml(query)}</strong>"</p>
+                        <p>Our knowledge base covers features, pricing, API documentation, and capabilities. Try:</p>
+                        <ul style="text-align: left; display: inline-block; margin: 16px 0;">
+                            <li>✓ Different keywords (e.g., "models" instead of "LLM")</li>
+                            <li>✓ Shorter search terms</li>
+                            <li>✓ Related topics (e.g., "coding" for "programming")</li>
+                        </ul>
+                        <p style="margin-top: 24px; color: var(--secondary-text-color);">Still can't find what you're looking for?</p>
+                        <a href="docs-ai.html?q=${encodeURIComponent(query)}" class="ai-prompt-button">
+                            Ask TyloAI Documentation AI ✨
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `<div class="results-section">
+                <div class="results-header">
+                    <h2>Results</h2>
+                    <span class="result-count">${results.length}</span>
+                </div>`;
+
+            results.forEach(result => {
+                const highlightedExcerpt = highlightQuery(result.excerpt, query);
+                html += `
+                    <div class="result-item" onclick="goToDoc('${result.id}')">
+                        <div class="result-category">${result.category}</div>
+                        <h3>${result.title}</h3>
+                        <div class="result-excerpt">${highlightedExcerpt}</div>
+                        <a href="docs.html#${result.id}" class="result-link">
+                            Read More →
+                        </a>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            resultsContainer.innerHTML = html;
+        }
+
+        // Highlight query in text
+        function highlightQuery(text, query) {
+            const regex = new RegExp(`(${escapeRegExp(query)})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // Escape Regex
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        // Highlight query in text
+        function highlightQuery(text, query) {
+            const regex = new RegExp(`(${escapeRegExp(query)})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        // Navigate to doc
+        function goToDoc(id) {
+            window.location.href = id; // 直接使用完整的相对路径
+        }
+
+        // Event Listeners
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value;
+            window.history.replaceState(null, '', `?q=${encodeURIComponent(query)}`);
+            performSearch(query);
+        });
+
+        // Initial search on page load
+        if (searchQuery) {
+            performSearch(searchQuery);
+        } else {
+            resultsContainer.innerHTML = `
+                <div class="no-results">
+                    <h2>Start Searching</h2>
+                    <p>Enter a search term to find documentation about TyloAI features, pricing, capabilities, and more.</p>
+                </div>
+            `;
+        }
+
+        // Focus search input on load
+        searchInput.focus();
+    </script>
+</body>
+</html>
